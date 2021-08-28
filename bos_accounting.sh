@@ -20,7 +20,7 @@ LNCLI="lncli"
 BOS="bos"
 if uname -a | grep umbrel > /dev/null; then
     LNCLI="docker exec -i lnd lncli"
-    BOS="docker run -d --rm -v $HOME/.bos:/home/node/.bos alexbosworth/balanceofsatoshis"
+    BOS="docker run -it --rm --network='host' --add-host=umbrel.local:10.21.21.9 -v $HOME/.bos:/home/node/.bos -v $HOME/umbrel/lnd:/home/node/.lnd:ro alexbosworth/balanceofsatoshis"
 fi
 
 # Get local channel balance
