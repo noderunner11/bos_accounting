@@ -20,7 +20,7 @@ LNCLI="lncli"
 BOS="bos"
 if uname -a | grep umbrel > /dev/null; then
     LNCLI="docker exec -i lnd lncli"
-    BOS="docker run -it --rm -v $HOME/.bos:/home/umbrel/.bos alexbosworth/balanceofsatoshis"
+    BOS="docker run -d --rm -v $HOME/.bos:/home/node/.bos alexbosworth/balanceofsatoshis"
 fi
 
 # Get local channel balance
