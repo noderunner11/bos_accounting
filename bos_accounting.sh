@@ -4,34 +4,34 @@
 # to the local channel balance for the last 7 days...
 #
 # It can be executed as a daily cron job to give a nice history
-# The results are written to /home/umbrel/scripts/routed_percentage.log
+# The results are written to bos_accounting.log
 #
 # BOS (Balance of Satoshi) needs to be installed (docker version)
 # bc needs to be installed (sudo apt-get bc)
 # jq needs to be installed (sudo apt-get jq)
-# A new alias needs to be defined in ~/.bash_aliases
-#
-# alias boss='docker run --rm --network="host" --add-host=umbrel.local:192.168.1.111 -v \
-# HOME/.bos:/home/node/.bos -v $HOME/umbrel/lnd:/home/node/.lnd:ro alexbosworth/balanceofsatoshis'
-#
+
 # Version: 0.0.3
 # Author: Dirk Krienbuehl https://t.me/Deekee62
 # ------------------------------------------------------------------------------------------------
-#
-# Source the aliases defined
-source ~/.bash_aliases
-shopt -s expand_aliases
+
+
+# Check installation: umbrel or native lnd
+LNCLI="lncli"
+if uname -a | grep umbrel > /dev/null; then
+    LNCLI="docker exec -i lnd lncli"
+fi
+
 # Get local channel balance
-a="$(docker exec lnd lncli channelbalance | /usr/bin/jq -r '.balance')"
+a="$($LNCLI channelbalance | /usr/bin/jq -r '.balance')"
 #
 # Get total forwarded amount of sats for the last 7 days
-b="$(boss chart-fees-earned --forwarded --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $8}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
+b="$(bos chart-fees-earned --forwarded --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $8}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
 #
 # Get the total amount of fees earned in the last 7 days
-c="$(boss chart-fees-earned  --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $8}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
+c="$(bos chart-fees-earned  --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $8}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
 #
 # Get the total amount of fees paid in the last 7 days
-d="$(boss chart-fees-paid  --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $9}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
+d="$(bos chart-fees-paid  --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $9}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
 #
 # Calculate the percentage of the forwared sats compared to the local channel balance for the last 7 days
 e=$(echo "scale=2; 100/($a/$b)" | /usr/bin/bc -l)
@@ -55,4 +55,4 @@ i=$(echo "scale=0; ($c-$d)" | bc -l)
 #
 # printf "%(%Y-%m-%d)T\t%(%T)T\t$a\t$b\t$e %%\t$f ppm\t$g ppm\t$h ppm\t$c\t-$d\t$i\n" >> /home/umbrel/scripts/bos_accounting.log
 #
-printf "%(%Y-%m-%d)T    %(%T)T    "$a"    "$b"    "$e"%%    "$f"ppm    "$g"ppm    "$h"ppm    "$c"    -"$d"    "$i"\n" >> /home/umbrel/scripts/bos_accounting.log
+printf "%(%Y-%m-%d)T    %(%T)T    "$a"    "$b"    "$e"%%    "$f"ppm    "$g"ppm    "$h"ppm    "$c"    -"$d"    "$i"\n" >> bos_accounting.log
