@@ -17,21 +17,23 @@
 
 # Check installation: umbrel or native lnd
 LNCLI="lncli"
+BOS="bos"
 if uname -a | grep umbrel > /dev/null; then
     LNCLI="docker exec -i lnd lncli"
+    BOS="docker run -it --rm -v $HOME/.bos:/home/umbrel/.bos alexbosworth/balanceofsatoshis"
 fi
 
 # Get local channel balance
 a="$($LNCLI channelbalance | /usr/bin/jq -r '.balance')"
 #
 # Get total forwarded amount of sats for the last 7 days
-b="$(bos chart-fees-earned --forwarded --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $8}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
+b="$($BOS chart-fees-earned --forwarded --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $8}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
 #
 # Get the total amount of fees earned in the last 7 days
-c="$(bos chart-fees-earned  --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $8}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
+c="$($BOS chart-fees-earned  --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $8}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
 #
 # Get the total amount of fees paid in the last 7 days
-d="$(bos chart-fees-paid  --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $9}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
+d="$($BOS chart-fees-paid  --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $9}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
 #
 # Calculate the percentage of the forwared sats compared to the local channel balance for the last 7 days
 e=$(echo "scale=2; 100/($a/$b)" | /usr/bin/bc -l)
