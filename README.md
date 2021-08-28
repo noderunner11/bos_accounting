@@ -1,7 +1,7 @@
-Fork of @Deekee62's Repo
+fork of @Deekee62's repo "bos_accounting"
 
-Changes:
-- Modifying commands lncli and bos to fit both native and dockerized installations (umbrel)
+changes:
+- modifying commands lncli and bos to fit both native and dockerized installations (umbrel)
 - saving output to local directory (repo dir)
 
 =============================================
