@@ -57,4 +57,4 @@ h=$(echo "scale=0; 1000000/($a/($c-($d+$chain)))" | bc -l)
 i=$(echo "scale=0; ($c-($d+$chain))" | bc -l)
 #
 # Print year, time, local channel balance, forwarded amount, % forwarded, fees earned ppm, fees paid ppm, fees net ppm, amount fees earned, amount fees paid, amount fees net
-printf "%(%Y-%m-%d)T    %(%T)T    "$a"    "$b"      "$e"%%       "$f"ppm     "$g"ppm    "$h"ppm    "$c"    -"$d"    "$i"\n" >> ~/bos_accounting/bos_accounting.log
+printf "%(%Y-%m-%d)T    %(%T)T    "$a"    "$b"      "$e"%%       "$f"ppm     "$g"ppm    "$h"ppm    "$c"    -"$d"      "$i"\n" >> ~/bos_accounting/bos_accounting.log
