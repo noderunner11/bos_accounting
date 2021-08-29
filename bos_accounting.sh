@@ -35,6 +35,9 @@ c="$($BOS chart-fees-earned  --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{prin
 # Get the total amount of fees paid in the last 7 days
 d="$($BOS chart-fees-paid  --days 7 | /bin/grep 'Total:' | /usr/bin/awk '{print $9}' | /bin/sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | /bin/sed 's/0.//' | tr -d '\r')"
 #
+# Get the total amount of chain paid in the last 7 days
+chain="$(bos chart-chain-fees  --days 7 | /bin/grep 'Total:' | awk '{print $10}' | sed -r -e 's/[[:cntrl:]]\[[0-9]{1,3}m//g' -e 's/\n/ /g' | sed 's/0.//' | tr -d '\r')"
+
 # Calculate the percentage of the forwared sats compared to the local channel balance for the last 7 days
 e=$(echo "scale=2; 100/($a/$b)" | /usr/bin/bc -l)
 #
@@ -47,11 +50,11 @@ g=$(echo "scale=0; 1000000/($a/$d)" | bc -l)
 #
 # Calculate the ppm of the net fees paid compared to the local channel balance for the last 7 days
 #
-h=$(echo "scale=0; 1000000/($a/($c-$d))" | bc -l)
+h=$(echo "scale=0; 1000000/($a/($c-($d+$chain)))" | bc -l)
 #
 # Calculate the sats of net fees earned
 #
-i=$(echo "scale=0; ($c-$d)" | bc -l)
+i=$(echo "scale=0; ($c-($d+$chain))" | bc -l)
 #
 # Print year, time, local channel balance, forwarded amount, % forwarded, fees earned ppm, fees paid ppm, fees net ppm, amount fees earned, amount fees paid, amount fees net
 printf "%(%Y-%m-%d)T    %(%T)T    "$a"    "$b"    "$e"%%    "$f"ppm    "$g"ppm    "$h"ppm    "$c"    -"$d"    "$i"\n" >> bos_accounting.log
