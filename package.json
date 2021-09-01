@@ -1,5 +1,5 @@
 {
-  "name": "bos_accounting_telegram",
+  "name": "bosaccountingbot",
   "version": "1.0.0",
   "description": "fork of @Deekee62's repo \"bos_accounting\"",
   "main": "index.js",
@@ -20,5 +20,6 @@
   "dependencies": {
     "shelljs": "^0.8.4",
     "telegraf": "^4.4.1"
-  }
+  },
+  "devDependencies": {}
 }
